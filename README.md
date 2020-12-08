@@ -16,15 +16,29 @@ https://github.com/golang/vscode-go 참조
 
 > all select -> 17개
 
-## 설치
+## Gin 설치
 https://github.com/gin-gonic/gin
 
-Installation
-To install Gin package, you need to install Go and set your Go workspace first.
-
 The first need Go installed (version 1.12+ is required), then you can use the below Go command to install Gin.
-$ go get -u github.com/gin-gonic/gin
-Import it in your code:
+
+> go get -u github.com/gin-gonic/gin
+
+
+main.go
+```go
+package main
+
 import "github.com/gin-gonic/gin"
-(Optional) Import net/http. This is required for example if using constants such as http.StatusOK.
-import "net/http"
+
+func main() {
+	r := gin.Default()
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+}
+
+```
+> go run main.go
