@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"time"
+	"net/http"
+
+	"go.mongodb.org/mongo-driver/bson"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -30,18 +32,6 @@ func mongoConn() (client *mongo.Client) {
 	}
 	fmt.Println("MongoDB Connection Made")
 	return client
-}
-func initMongoDB() {
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
-	if err != nil {
-		log.Fatal(err)
-	}
-	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-	err = client.Connect(ctx)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer client.Disconnect(ctx)
 }
 
 type Post struct {
@@ -79,11 +69,25 @@ func main() {
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message": "pong",
+			"message": "pong1",
 		})
 	})
 
-	InsertPost("test1", "body1")
+	r.GET("/post", func(c *gin.Context) {
+
+		client := mongoConn()
+
+		collection := client.Database("testdb").Collection("post")
+
+		filter := bson.D{}
+		var post Post
+		err := collection.FindOne(context.TODO(), filter).Decode(&post)
+		if err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, post)
+	})
+	// InsertPost("test1", "body1")
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
