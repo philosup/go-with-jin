@@ -63,3 +63,9 @@ https://m.blog.naver.com/wideeyed/221815886721
 https://www.mongodb.com/golang
 
 > go get go.mongodb.org/mongo-driver
+
+## 패키지 의존성 관리  Go Module
+
+1.11버전 이후
+
+> go mod init philosup/go-with-jin
