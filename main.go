@@ -39,38 +39,30 @@ type Post struct {
 	Body  string `json:"body,omitempty"`
 }
 
-func InsertPost(title string, body string) {
-
-	client := mongoConn()
-
-	post := Post{title, body}
-	collection := client.Database("testdb").Collection("post")
-	insertResult, err := collection.InsertOne(context.TODO(), post)
-
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Inserted post with ID:", insertResult.InsertedID)
-}
-
-// func GetPost(id bson.ObjectId) {
-// 	collection := client.Database("testdb").Collection("post")
-// 	filter := bson.D
-// 	var post Post
-
-// 	err := collection.FindOne(context.TODO(), filter).Decode(&post)
-// 	if err != nil {
-// 		log.Fatal(err)
-// 	}
-// 	fmt.Println("Found post with title ", post.Title)
-// }
-
 func main() {
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong1",
 		})
+	})
+
+	r.POST("/post", func(c *gin.Context) {
+
+		var post Post
+
+		c.BindJSON(&post)
+
+		client := mongoConn()
+
+		// post := Post{title, body}
+		collection := client.Database("testdb").Collection("post")
+		insertResult, err := collection.InsertOne(context.TODO(), post)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, insertResult)
 	})
 
 	r.GET("/post", func(c *gin.Context) {
@@ -87,7 +79,24 @@ func main() {
 		}
 		c.JSON(http.StatusOK, post)
 	})
-	// InsertPost("test1", "body1")
+
+	r.GET("/post/all", func(c *gin.Context) {
+
+		client := mongoConn()
+
+		collection := client.Database("testdb").Collection("post")
+
+		filter := bson.M{}
+		cursor, err := collection.Find(context.TODO(), filter)
+		if err != nil {
+			log.Fatal(err)
+		}
+		var posts []Post
+		if err = cursor.All(context.TODO(), &posts); err != nil {
+			log.Fatal(err)
+		}
+		c.JSON(http.StatusOK, posts)
+	})
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
