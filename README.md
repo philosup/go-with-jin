@@ -69,3 +69,13 @@ https://www.mongodb.com/golang
 1.11버전 이후
 
 > go mod init philosup/go-with-jin
+
+go.mod 파일이 생성되고
+
+VSCode에서 파일을 열면 하단에 업데이트 하라고 나오느거 2개
+ - gopls
+ - 하나는 모르겠;;;
+
+그러고 나면 module 네임. 이분 위쪽에 create ... 나오는 거 클릭;;
+ - vendor폴더 생성 및 하위에 패키지가 다운로드.
+ - go.sum파일 생성
